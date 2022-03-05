@@ -1,0 +1,28 @@
+{
+  "name": "fts",
+  "version": "1.0.0",
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "webpack-cli"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@ngrok/ngrok-api": "^0.3.0",
+    "cli-progress": "^3.10.0",
+    "colors": "^1.4.0",
+    "extract-zip": "^2.0.1",
+    "form-data": "^4.0.0",
+    "ip": "^1.1.5",
+    "tsconfig-paths": "^3.12.0",
+    "ws": "^8.5.0"
+  },
+  "devDependencies": {
+    "@types/cli-progress": "^3.9.2",
+    "@types/ip": "^1.1.0",
+    "@types/ws": "^8.5.2",
+    "rimraf": "^3.0.2",
+    "ts-loader": "^9.2.7",
+    "typescript": "^4.6.2",
+    "webpack": "^5.70.0"
+  }
+}
