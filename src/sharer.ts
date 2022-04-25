@@ -4,7 +4,7 @@ import net from 'net';
 import input from './util/input';
 import { log } from './util/text-format';
 import getVariable from './variables/get-variable';
-import { Constants } from './constants';
+import os from 'os';
 
 async function main() {
     const port = await getVariable('port');
@@ -30,7 +30,16 @@ async function main() {
             .pipe(socket);
     });
 
-    server.listen(port, () => log(`Server is on <cyan>${Constants.IP}:${port}</cyan>. Send this address your friend.`))
+    server.listen(port, () => {
+        log(`\nAvailable addresses`);
+
+        Object.entries(os.networkInterfaces()).forEach(([ name, addresses ], i, { length }) => {
+            const { address: ip } = addresses?.at(-1)!;
+            log(`  ${i + 1 < length ? '├' : '└'} <cyan>${ip}:${port}</cyan> (<grey>${name}</grey>)`);
+        });
+
+        log(`\nSend one of this your friend`);
+    });
 }
 
 main();
