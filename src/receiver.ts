@@ -7,6 +7,7 @@ import extract from 'extract-zip';
 import input from './util/input';
 import receive from './util/receive';
 import { log, textFormat } from './util/text-format';
+import { humanizeSize } from './util/humanize-size';
 
 async function main() {
     
@@ -20,7 +21,7 @@ async function main() {
     const { name, size } = await receive<IFileInfo>(socket);
     const filePath = path.join('./', name);
 
-    log(`Received <green>${name}</green>`)(`Size: <cyan>${size} bytes</cyan>`);
+    log(`Received <green>${name}</green>`)(`Size: <cyan>${humanizeSize(size)}</cyan>`);
 
     const progressBar = new SingleBar({
         format: textFormat(`<green>${name}</green> |<cyan>{bar}</cyan>| [<yellow>{percentage}%</yellow>] | Time left: <magenta>{eta}s</magenta>`),
