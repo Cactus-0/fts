@@ -6,8 +6,10 @@ export function log(text: string): typeof log {
 }
 
 export function textFormat(text: string): string {
-    return text.replace(/<(?<color>\w+)>(?<text>.+)<\/\k<color>>/gi, (...[ , , , , , { color, text } ]) => {
+    return text.replace(/<(?<color>\w+)>(?<text>[^<>]*)<\/>/gi, (...[ , , , , , { color, text } ]) => {
         // @ts-ignore
-        return colors[color](text);
+        return (colors[color]?.(text) ?? text)
+            .replaceAll(';sl', '<')
+            .replaceAll(';sr', '>')
     });
 }

@@ -1,13 +1,12 @@
 import fs from 'fs';
 import net from 'net';
 import path from 'path';
-import { SingleBar } from 'cli-progress';
 import extract from 'extract-zip';
 
 import input from './util/input';
 import receive from './util/receive';
-import { log, textFormat } from './util/text-format';
-import { humanizeSize } from './util/humanize-size';
+import { log } from './util/text-format';
+import { Loader } from './loader';
 
 async function main() {
     
@@ -21,42 +20,34 @@ async function main() {
     const { name, size } = await receive<IFileInfo>(socket);
     const filePath = path.join('./', name);
 
-    log(`Received <green>${name}</green>`)(`Size: <cyan>${humanizeSize(size)}</cyan>`);
+    const loader = new Loader(name, size);
 
-    const progressBar = new SingleBar({
-        format: textFormat(`<green>${name}</green> |<cyan>{bar}</cyan>| [<yellow>{percentage}%</yellow>] | Time left: <magenta>{eta}s</magenta>`),
-        barCompleteChar: '\u2588',
-        barIncompleteChar: '\u2591',
-        hideCursor: true,
-    });
+    loader.start();
 
-    progressBar.start(size, 0);
-
-    const writer = fs.createWriteStream(filePath);
+    const writeStream = fs.createWriteStream(filePath);
 
     socket.on('data', data => {
-        progressBar.increment(data.length);
-        writer.write(data);
+        loader.appendData(data.length);
+        writeStream.write(data);
     });
 
     socket.once('close', async () => {
-        progressBar.stop();
-        writer.end();
+        loader.stop();
+        writeStream.end();
+
         log('File received.');
 
         if (!name.endsWith('.zip')) return;
 
-        log('This is an archive. Do you want to unpack it? <cyan>(y/n)</cyan>');
+        log('This is an archive. Do you want to unpack it? <cyan>(y/n)</>');
         const unpack = (await input()).toLowerCase() === 'y';
 
         if (!unpack) return;
 
         await extract(filePath, { dir: process.cwd() });
 
-        log(`Unpacking. Please, wait...`)
-
+        log(`Unpacking. Please, wait...`);
         fs.rmSync(filePath);
-
         log(`Unpacked.`);
     });
 
